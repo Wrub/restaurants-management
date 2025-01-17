@@ -27,4 +27,8 @@ export class RestaurantService {
 
     return newRestaurant;
   }
+
+  async deleteRestaurant(id: number): Promise<void> {
+    await this.restaurantRepository.delete(id);
+  }
 }

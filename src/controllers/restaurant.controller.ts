@@ -1,7 +1,8 @@
 import { createRestaurantSchema } from "@/schemas/restaurant.schema";
 import { RestaurantService } from "@/services/restaurant.service";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { Request, Response } from "express";
-import { ZodError } from "zod";
+import { z, ZodError } from "zod";
 
 // TODO: Criar e inserir um global error handler
 
@@ -39,6 +40,23 @@ export class RestaurantController {
       }
 
       res.status(500).json({ error: "Internal server error" });
+    }
+  };
+
+  deleteRestaurant = async (req: Request, res: Response) => {
+    try {
+      const deleteRestaurantSchema = z.coerce.number();
+      const parsedId = deleteRestaurantSchema.parse(req.params.id);
+
+      await this.restaurantService.deleteRestaurant(parsedId);
+
+      res.sendStatus(200);
+    } catch (error: any) {
+      if (error instanceof ZodError) {
+        res.status(400).json({ error: error.errors });
+      }
+
+      res.status(500).json({ error: `Internal Server Error, ${error}` });
     }
   };
 }

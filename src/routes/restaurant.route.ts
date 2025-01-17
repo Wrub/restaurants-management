@@ -11,5 +11,6 @@ const restaurantController = new RestaurantController(
 router.get("/", restaurantController.getAllRestaurants);
 router.get("/:id", restaurantController.getRestaurantById);
 router.post("/", restaurantController.createRestaurant);
+router.delete("/:id", restaurantController.deleteRestaurant);
 
 export default router;

@@ -1,5 +1,5 @@
 import { RestaurantController } from "@/controllers/restaurant.controller";
-import { DIContainer } from "@/utils/diContainer";
+import { DIContainer } from "@/utils/di-container";
 import { Router } from "express";
 
 const router = Router();

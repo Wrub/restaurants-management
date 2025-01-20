@@ -1,4 +1,4 @@
-import { Restaurant } from "@prisma/client";
+import { BookingSlot, Restaurant } from "@prisma/client";
 
 export interface RestaurantRepository {
   findAll(): Promise<Restaurant[]>;

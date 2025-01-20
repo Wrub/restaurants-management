@@ -1,7 +1,7 @@
 import {
   ICreateRestaurant,
   RestaurantRepository,
-} from "@/interfaces/restaurant.repository";
+} from "@/interfaces/restaurant.interface";
 import prisma from "@/prisma/client";
 import { Prisma, Restaurant } from "@prisma/client";
 
@@ -15,8 +15,23 @@ export class PrismaRestaurantRepository implements RestaurantRepository {
   }
 
   async create(data: ICreateRestaurant) {
+    const bookingSlots = this.generateHourlyBookingSlots("09:00", "18:00").map(
+      (slot) => ({
+        time: slot.time,
+        isReserved: slot.isReserved,
+      })
+    );
+
     const newRestaurant = await prisma.restaurant.create({
-      data,
+      data: {
+        ...data,
+        bookingSlots: {
+          create: bookingSlots,
+        },
+      },
+      include: {
+        bookingSlots: true,
+      },
     });
 
     return newRestaurant;
@@ -47,5 +62,31 @@ export class PrismaRestaurantRepository implements RestaurantRepository {
       where: { id },
       data,
     });
+  }
+
+  private generateHourlyBookingSlots(
+    startTime: string,
+    endTime: string
+  ): { time: Date; isReserved: boolean }[] {
+    const slots: { time: Date; isReserved: boolean }[] = [];
+
+    const start = new Date();
+    const [startHour, startMinute] = startTime.split(":").map(Number);
+    start.setHours(startHour, startMinute, 0, 0);
+
+    const end = new Date();
+    const [endHour, endMinute] = endTime.split(":").map(Number);
+    end.setHours(endHour, endMinute, 0, 0);
+
+    while (start < end) {
+      slots.push({
+        time: new Date(start),
+        isReserved: false,
+      });
+
+      start.setHours(start.getHours() + 1);
+    }
+
+    return slots;
   }
 }

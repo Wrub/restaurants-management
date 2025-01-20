@@ -1,4 +1,4 @@
-import { ICreateRestaurant } from "@/interfaces/restaurant.repository";
+import { ICreateRestaurant } from "@/interfaces/restaurant.interface";
 import { PrismaRestaurantRepository } from "@/repositories/restaurant.repository";
 import { Restaurant } from "@prisma/client";
 
@@ -19,13 +19,20 @@ export class RestaurantService {
   }
 
   async createRestaurant(data: ICreateRestaurant) {
-    const newRestaurant = await this.restaurantRepository.create(data);
+    try {
+      // Criação do restaurante com os horários de reserva
+      const newRestaurant = await this.restaurantRepository.create({
+        data,
+      });
 
-    if (!newRestaurant) {
-      throw new Error("Could not create a restaurant at service layer");
+      if (!newRestaurant) {
+        throw new Error("Could not create a restaurant at service layer");
+      }
+
+      return newRestaurant;
+    } catch (error: any) {
+      throw new Error(`Error creating restaurant: ${error.message}`);
     }
-
-    return newRestaurant;
   }
 
   async deleteRestaurant(id: number): Promise<void> {

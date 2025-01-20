@@ -1,6 +1,7 @@
 import { z } from "zod";
+import { bookingSlotsSchema } from "./booking-slots.schema";
 
-const restaurantSchema = z.object({
+export const restaurantSchema = z.object({
   id: z.number().int(),
   name: z.string(),
   address: z.string(),
@@ -9,9 +10,8 @@ const restaurantSchema = z.object({
   reservations: z.number().int(),
   createdAt: z.date(),
   updatedAt: z.date(),
+  bookingSlots: z.array(bookingSlotsSchema),
 });
-
-export { restaurantSchema };
 
 export const createRestaurantSchema = z.object({
   name: z.string().min(1, "Name is required"),

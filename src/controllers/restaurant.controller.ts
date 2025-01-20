@@ -1,6 +1,8 @@
-import { createRestaurantSchema } from "@/schemas/restaurant.schema";
+import {
+  createRestaurantSchema,
+  restaurantSchema,
+} from "@/schemas/restaurant.schema";
 import { RestaurantService } from "@/services/restaurant.service";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { Request, Response } from "express";
 import { z, ZodError } from "zod";
 
@@ -37,9 +39,9 @@ export class RestaurantController {
     } catch (error: any) {
       if (error instanceof ZodError) {
         res.status(400).json({ error: error.errors });
+      } else {
+        res.status(500).json({ error: "Internal server error" });
       }
-
-      res.status(500).json({ error: "Internal server error" });
     }
   };
 
@@ -54,9 +56,36 @@ export class RestaurantController {
     } catch (error: any) {
       if (error instanceof ZodError) {
         res.status(400).json({ error: error.errors });
+      } else {
+        res.status(500).json({ error: `Internal Server Error, ${error}` });
       }
+    }
+  };
 
-      res.status(500).json({ error: `Internal Server Error, ${error}` });
+  updateRestaurant = async (req: Request, res: Response) => {
+    try {
+      const updateRestaurantSchema = z.object({
+        id: z.coerce.number(),
+        data: restaurantSchema.partial(),
+      });
+
+      const { id, data } = updateRestaurantSchema.parse({
+        id: req.params.id,
+        data: req.body.data,
+      });
+
+      const updatedRestaurant = await this.restaurantService.updateRestaurant(
+        id,
+        data
+      );
+
+      res.status(200).json(updatedRestaurant);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        res.status(400).json({ error: error.errors });
+      } else {
+        res.status(500).json({ error: `Internal Server Error, ${error}` });
+      }
     }
   };
 }

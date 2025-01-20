@@ -31,4 +31,17 @@ export class RestaurantService {
   async deleteRestaurant(id: number): Promise<void> {
     await this.restaurantRepository.delete(id);
   }
+
+  async updateRestaurant(
+    id: number,
+    data: Partial<Restaurant>
+  ): Promise<Restaurant | null> {
+    const updatedRestaurant = await this.restaurantRepository.update(id, data);
+
+    if (!updatedRestaurant) {
+      throw new Error(`Could not update the restaurant with id: ${id}`);
+    }
+
+    return updatedRestaurant;
+  }
 }
